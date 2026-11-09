@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUNO 레퍼런스 곡 제작 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 왼쪽 검색창 + 분류별 문서 목록, 오른쪽에 문서 한 개씩 표시하는 위키 구조 */
+:root{
+  --bg:#f3f5f6;
+  --surface:#ffffff;
+  --ink:#16202a;
+  --muted:#56636f;
+  --line:#d7dde2;
+  --accent:#0b6e75;
+  --accent-soft:#e0f0f1;
+  --warn:#9a5b00;
+  --warn-soft:#fbf1df;
+  --code-bg:#eef2f4;
+  --font-display:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11171c; --surface:#182129; --ink:#e4eaee; --muted:#9aa8b3; --line:#2b3741;
+    --accent:#4fc2c9; --accent-soft:#163238; --warn:#f0b452; --warn-soft:#2f2615; --code-bg:#0f1519;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11171c; --surface:#182129; --ink:#e4eaee; --muted:#9aa8b3; --line:#2b3741;
+  --accent:#4fc2c9; --accent-soft:#163238; --warn:#f0b452; --warn-soft:#2f2615; --code-bg:#0f1519;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:270px minmax(0,1fr);gap:36px;max-width:1200px;margin:0 auto;padding:24px 24px 80px}
+
+/* 사이드바 */
+aside.side{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:14px;padding-bottom:12px}
+.brand{display:block;text-decoration:none;color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:22px;line-height:1.3;margin:0 0 4px;padding:0 0 12px;border-bottom:3px solid var(--accent);text-wrap:balance}
+.brand small{display:block;font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--accent);margin-top:6px;line-height:1.4}
+.search{margin:14px 0 12px}
+.search label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.search input{width:100%;font:inherit;font-size:14.5px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.search .hint{font-size:12px;color:var(--muted);margin-top:4px}
+.navcat{border-top:1px solid var(--line)}
+.navcat summary{list-style:none;cursor:pointer;padding:8px 4px;font-family:var(--font-display);font-weight:700;font-size:13.5px;display:flex;align-items:baseline;gap:8px}
+.navcat summary span:first-child{flex:1}
+.navwrap>summary{list-style:none;cursor:pointer;font-weight:700;font-size:14px;padding:8px 2px;border-top:1px solid var(--line);display:flex;justify-content:space-between}
+.navwrap>summary::-webkit-details-marker{display:none}
+.navwrap>summary::after{content:"펼치기";font-weight:400;font-size:12.5px;color:var(--accent)}
+.navwrap[open]>summary::after{content:"접기"}
+@media (min-width:901px){.navwrap>summary{display:none}}
+.navcat summary::-webkit-details-marker{display:none}
+.navcat summary .cnt{font-family:var(--font-mono);font-weight:400;color:var(--muted);font-size:12px}
+.navcat summary::after{content:"+";font-family:var(--font-mono);color:var(--muted)}
+.navcat[open] summary::after{content:"−"}
+.navcat ul{list-style:none;margin:0 0 8px;padding:0}
+.navcat li{margin:0}
+.navcat a{display:block;padding:4px 10px;border-radius:6px;color:var(--ink);text-decoration:none;border-left:2px solid transparent}
+.navcat a:hover{background:var(--surface)}
+.navcat a.on{background:var(--accent-soft);border-left-color:var(--accent);color:var(--accent);font-weight:500}
+
+/* 문서 */
+main{min-width:0;max-width:800px}
+.topbar{display:flex;align-items:center;gap:12px;margin:0 0 8px;min-height:30px}
+.crumb{font-size:13px;color:var(--muted)}
+button.back{font:inherit;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:3px 12px;cursor:pointer;white-space:nowrap}
+button.back:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+button.back:disabled{opacity:.45;cursor:default}
+.crumb a{color:var(--muted)}
+article.doc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:26px 30px 22px}
+article.doc[hidden]{display:none}
+h1{font-family:var(--font-display);font-weight:700;font-size:30px;line-height:1.3;margin:0 0 6px;text-wrap:balance}
+.docmeta{font-size:12.5px;color:var(--muted);font-family:var(--font-mono);margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:20px;line-height:1.4;margin:26px 0 10px;text-wrap:balance}
+h3{font-family:var(--font-display);font-weight:700;font-size:17px;margin:22px 0 8px}
+p{margin:0 0 14px;max-width:68ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:68ch}
+li{margin-bottom:6px}
+.lede{font-size:17px;max-width:65ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.chip{display:inline-block;font-size:12px;font-family:var(--font-mono);padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--muted)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.warn{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.note p:last-child,.warn p:last-child{margin-bottom:0}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:4px;vertical-align:1px;line-height:1.6}
+.tag.official{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+.tag.community{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tag.verify{background:var(--surface);color:var(--warn);border:1px dashed var(--warn)}
+.tag.guess{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
+.legend{display:grid;gap:6px;font-size:14px;color:var(--muted);margin:10px 0 0}
+.tablebox{overflow-x:auto;margin:12px 0 18px;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-display);font-weight:700;background:var(--code-bg);font-size:13.5px}
+tr:last-child td{border-bottom:none}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td:first-child{min-width:7.5em}
+.prompt{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;margin:8px 0 14px}
+.prompt .plabel{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px 0 12px;font-size:12px;color:var(--muted);font-family:var(--font-mono)}
+.prompt pre{margin:0;padding:6px 12px 12px;font-family:var(--font-mono);font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+button.copy{font:inherit;font-size:12px;font-family:var(--font-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:2px 10px;cursor:pointer}
+button.copy:hover{border-color:var(--accent);color:var(--accent)}
+.order{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px;padding:0;list-style:none}
+.order li{margin:0;font-size:13.5px;padding:4px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.order li b{font-family:var(--font-mono);color:var(--accent);margin-right:4px}
+.steps{counter-reset:st;list-style:none;padding:0;display:grid;gap:10px;max-width:none}
+.steps>li{counter-increment:st;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 16px 2px 54px;position:relative}
+.steps>li::before{content:counter(st);position:absolute;left:14px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--surface);font-family:var(--font-mono);display:grid;place-items:center;font-size:14px}
+.steps h3{margin:0 0 4px;font-size:16px}
+dl.facts{display:grid;grid-template-columns:9em 1fr;gap:8px 16px;margin:0 0 16px;font-size:15px}
+dl.facts dt{font-weight:700;color:var(--muted);font-size:13.5px;padding-top:2px}
+dl.facts dd{margin:0}
+.related{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:14px}
+.related .lbl{font-weight:700;color:var(--muted);font-size:12.5px;margin-right:6px}
+.related .links{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.related .links a{text-decoration:none;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--bg)}
+.related .links a:hover{border-color:var(--accent)}
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:12px 0 18px}
+.catcard{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg)}
+.catcard h3{margin:0 0 6px;font-size:15.5px}
+.catcard ul{list-style:none;padding:0;margin:0;font-size:14px}
+.catcard li{margin:0 0 3px}
+.doclist{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;max-width:none}
+.doclist li{margin:0}
+.doclist a{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);text-decoration:none;color:var(--ink)}
+.doclist a span{display:block;font-size:13px;color:var(--muted)}
+.doclist a:hover{border-color:var(--accent)}
+.results{list-style:none;padding:0;max-width:none}
+.results li{padding:12px 0;border-bottom:1px solid var(--line);margin:0}
+.results a{font-weight:700;font-size:16px}
+.results .rc{font-size:12px;color:var(--muted);margin-left:8px;font-family:var(--font-mono)}
+.results p{font-size:14px;color:var(--muted);margin:4px 0 0}
+.results mark{background:var(--warn-soft);color:var(--ink);padding:0 2px;border-radius:2px}
+.builder .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:14px}
+.builder label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.builder select,.builder input[type=number]{width:100%;font:inherit;font-size:14.5px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.builder fieldset{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0 0 14px}
+.builder legend{font-size:13px;font-weight:700;color:var(--muted);padding:0 4px}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
+.checks label{font-weight:400;color:var(--ink);display:flex;gap:5px;align-items:center;margin:0;cursor:pointer}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+button.act{font:inherit;font-size:14px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);border-radius:6px;padding:6px 14px;cursor:pointer}
+button.act.ghost{background:transparent;color:var(--accent)}
+.small{font-size:13.5px;color:var(--muted)}
+.academy{margin:-26px -30px 22px;padding:22px 30px 20px;background:var(--accent);color:var(--surface);border-radius:12px 12px 0 0}
+.academy .who{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1.3;margin:0;text-wrap:balance}
+.academy .course2{font-size:15px;margin:4px 0 0;opacity:.92}
+.sitefoot{margin-top:28px;padding:20px 22px;border-top:3px solid var(--accent);background:var(--surface);border-radius:0 0 12px 12px;border-left:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sitefoot .who{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--accent);margin:0}
+.sitefoot p{margin:4px 0 0;font-size:13.5px;color:var(--muted)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr;gap:12px;padding:14px 16px 60px}
+  aside.side{position:static;max-height:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  article.doc{padding:20px 18px 18px}
+  .academy{margin:-20px -18px 18px;padding:18px 18px 16px}
+  .academy .who{font-size:23px}
+  h1{font-size:25px}
+  dl.facts{grid-template-columns:1fr;gap:2px}
+  dl.facts dd{margin-bottom:8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside class="side" aria-label="문서 목록">
+  <a class="brand" href="#home">SUNO 레퍼런스 곡 위키<small>엠나인아카데미 · 게임음악작곡</small></a>
+  <div class="search">
+    <label for="q">문서 검색</label>
+    <input id="q" type="search" placeholder="예: Variety, 스템, 보스" autocomplete="off">
+    <div class="hint">Enter를 누르면 첫 번째 결과로 이동합니다.</div>
+  </div>
+  <details class="navwrap" id="navwrap" open><summary id="navsum">문서 목록</summary><nav id="nav"></nav></details>
+</aside>
+
+<main>
+<div class="topbar"><button class="back" type="button" id="backbtn" aria-label="이전 문서로 돌아가기">← 뒤로</button><div class="crumb" id="crumb"></div></div>
+<div id="docs">
+
+<!-- ===== 시작하기 ===== -->
+<article class="doc" data-id="home" data-cat="start" data-title="대문">
+  <div class="academy">
+    <p class="who">엠나인아카데미 수강생용 학습자료</p>
+    <p class="course2">게임음악작곡 과정</p>
+  </div>
+  <h1>SUNO 레퍼런스 곡 위키</h1>
+  <div class="docmeta">2026-11-08 확인</div>
+  <p class="lede">이 자료는 SUNO에게 곡을 대신 쓰게 하는 법을 알려 드리려는 게 아닙니다. 기획자와 방향을 맞추고, 편성과 편곡을 공부하는 데 쓸 레퍼런스를 빠르게 만드는 방법을 정리했습니다. 포트폴리오에 들어갈 곡은 여러분이 직접 씁니다.</p>
+  <div class="meta">
+    <span class="chip">2026년 11월 기준</span>
+    <span class="chip">SUNO v6 기준</span>
+    <span class="chip">요금·한도는 수시로 바뀜</span>
+    <span class="chip" id="doccount">문서</span>
+  </div>
+  <h2>처음이라면 이 순서로 읽으세요</h2>
+  <ol>
+    <li><a href="#why">레퍼런스 곡이 필요한 순간</a></li>
+    <li><a href="#inputs">입력과 결과</a></li>
+    <li><a href="#style-order">Style 입력란 작성 순서</a></li>
+    <li><a href="#order-test">순서 실험</a></li>
+    <li><a href="#arrange-basics">편곡 공부에 쓸 곡의 조건</a></li>
+  </ol>
+  <h2>분류별 문서</h2>
+  <div class="catgrid" id="catgrid"></div>
+  <h2>정보 신뢰도 표시</h2>
+  <div class="legend" aria-label="정보 신뢰도 표시">
+    <span><span class="tag official">공식</span>SUNO 도움말·공지에서 확인한 내용</span>
+    <span><span class="tag community">커뮤니티</span>사용자 테스트에서 나온 경향</span>
+    <span><span class="tag verify">확인 필요</span>외부 글에서만 확인, 직접 확인 권장</span>
+    <span><span class="tag guess">추측</span>제 판단이나 확인되지 않은 내용</span>
+  </div>
+</article>
+
+<article class="doc" data-id="why" data-cat="start" data-title="레퍼런스 곡이 필요한 순간" hidden>
+  <h1>레퍼런스 곡이 필요한 순간</h1>
+  <div class="docmeta">분류: 시작하기</div>
+  <p>실무에서 기획서에 "웅장한 보스전 음악" 한 줄만 적혀 오는 경우가 많습니다. 이 말을 듣고 작곡가가 떠올리는 소리와 기획자가 떠올리는 소리는 대부분 다릅니다. 그래서 본 작업에 들어가기 전에 30초~1분짜리 방향 샘플 2~3개를 들려주고 "이 중 어느 쪽인가요?"를 묻는 단계가 필요합니다.</p>
+  <p>SUNO를 쓰면 이 샘플을 짧은 시간에 여러 개 만들 수 있습니다. 다만 SUNO는 아래 세 가지 목적으로만 쓰세요.</p>
+  <ol>
+    <li><b>방향 합의:</b> 장르, 편성, 템포, 분위기를 기획자와 맞추기 위한 샘플</li>
+    <li><b>비교 실험:</b> 같은 장면을 오케스트라로 할지, 신스로 할지 결정하기 전에 들어 보는 용도</li>
+    <li><b>편곡 연구:</b> 곡의 구성과 레이어를 뜯어보고 악기 역할을 분석할 때 쓰는 재료</li>
+  </ol>
+  <div class="warn">
+    <p><b>학원 원칙:</b> SUNO 결과물을 과제나 포트폴리오에 본인 작곡으로 제출하지 마세요. 레퍼런스로 썼다면 어디에 썼는지 적어 두세요. 면접에서 작업 과정을 물었을 때 막힘없이 설명할 수 있어야 합니다.</p>
+  </div>
+</article>
+
+<!-- ===== 기본 원리 ===== -->
+<article class="doc" data-id="inputs" data-cat="basics" data-title="입력과 결과" hidden>
+  <h1>입력과 결과</h1>
+  <div class="docmeta">분류: 기본 원리</div>
+  <h2>무엇을 넣으면 무엇이 나오나</h2>
+  <p>SUNO에 넣는 재료는 크게 다섯 가지입니다. 소리를 묘사하는 <a href="#fields">Style 입력란</a>, 가사와 구간 태그를 적는 <a href="#lyrics-structure">Lyrics 입력란</a>, 빼고 싶은 요소를 적는 <a href="#exclude">Exclude 입력란</a>, 해석 방식을 조절하는 슬라이더(<a href="#weirdness">Weirdness</a>, <a href="#style-influence">Style Influence</a>, <a href="#audio-influence">Audio Influence</a>, <a href="#variety">Variety</a>), 그리고 선택 사항인 오디오·이미지·영상입니다. <span class="tag official">공식</span> v6부터는 텍스트뿐 아니라 오디오, 이미지, 영상을 재료로 곡을 만들 수 있습니다.</p>
+  <p>결과물은 믹스가 끝난 오디오 한 곡입니다. 악기별 트랙(스템)이나 MIDI가 필요하면 곡을 만든 뒤 따로 추출해야 합니다. 그래서 편곡 공부에 쓸 곡은 처음부터 "분리하기 쉬운 곡"으로 만들어야 합니다. 자세한 조건은 <a href="#arrange-basics">편곡 공부에 쓸 곡의 조건</a> 문서에 있습니다.</p>
+  <h2>입력을 처리하는 방식은 공개되지 않았습니다</h2>
+  <p>SUNO는 모델 구조나 학습 방식을 자세히 공개하지 않았습니다. 그래서 "어떤 단어를 어떻게 해석한다"는 설명은 대부분 사용자들이 반복 테스트로 찾은 경향입니다. 이 위키에서도 공식 내용과 커뮤니티 경향을 표시로 구분했습니다.</p>
+  <p>실제로 써 보면 다음과 같은 특징을 확인할 수 있습니다.</p>
+  <ul>
+    <li><b>같은 입력도 매번 다른 곡이 나옵니다.</b> 마음에 드는 결과가 나오면 그 곡을 바탕으로 편집하는 편이 다시 뽑는 것보다 효율적입니다.</li>
+    <li><b>텍스트로 적은 지시는 악보처럼 지켜지지 않고, 결과에 경향으로만 반영됩니다.</b> "D minor, i-VI-III-VII"처럼 적어도 그대로 지켜진다는 보장은 없습니다. <span class="tag guess">추측</span> 조성과 코드는 반드시 귀로 확인하세요.</li>
+    <li><b>묘사가 모호할수록 평균적인 소리가 나옵니다.</b> "epic music"만 쓰면 어디선가 들어 본 듯한 트레일러 음악이 나오기 쉽습니다.</li>
+  </ul>
+</article>
+
+<article class="doc" data-id="models" data-cat="basics" data-title="모델 고르기" hidden>
+  <h1>모델 고르기</h1>
+  <div class="docmeta">분류: 기본 원리</div>
+  <p><span class="tag official">공식</span> 2026년 9월 9일에 v6 계열 세 모델이 나왔고, SUNO는 이전 모델의 서비스를 모두 종료한다고 밝혔습니다. 세 모델 모두 최대 8분 길이의 곡을 만들 수 있습니다. 모델은 만들기 화면 오른쪽 위의 목록에서 고릅니다.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>모델</th><th>이용 가능 요금제</th><th>SUNO의 설명</th><th>수업에서 쓰는 상황</th></tr></thead>
+    <tbody>
+      <tr><td><b>v6</b></td><td>Pro, Premier</td><td>여러 장르를 고르게 소화하는 기본 모델</td><td>방향을 확정할 때, 편곡 분석용 레퍼런스</td></tr>
+      <tr><td><b>v6-wild</b></td><td>Pro, Premier</td><td>장르를 섞거나 예상 밖의 선택을 하며, 프롬프트를 덜 따름</td><td>아이디어가 막혔을 때, 새로운 질감을 찾을 때</td></tr>
+      <tr><td><b>v6-mini</b></td><td>모든 요금제(무료 포함)</td><td>가볍고 빨라서 여러 아이디어를 짧은 시간에 시험해 보기 좋음</td><td>초기 스케치, 프롬프트 연습</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>모델끼리 비교할 때는 프롬프트와 슬라이더를 그대로 두고 모델만 바꾸세요. 원칙은 <a href="#one-change">한 번에 하나만 바꾸기</a> 문서와 같습니다.</p>
+</article>
+
+<article class="doc" data-id="weirdness" data-cat="basics" data-title="Weirdness" hidden>
+  <h1>Weirdness</h1>
+  <div class="docmeta">분류: 기본 원리 · 슬라이더</div>
+  <dl class="facts">
+    <dt>하는 일</dt><dd>결과가 익숙한 쪽으로 나올지, 예상 밖으로 나올지 정합니다.</dd>
+    <dt>범위</dt><dd><span class="tag official">공식</span> Safe에서 Chaos까지 조절하며, 50%로 두면 보통 예상되는 결과가 나옵니다.</dd>
+    <dt>위치</dt><dd>Advanced(Custom) 모드의 슬라이더 영역</dd>
+  </dl>
+  <h2>사용 요령</h2>
+  <ul>
+    <li>결과가 너무 산만하면 다른 항목은 그대로 두고 Weirdness만 내려 보세요.</li>
+    <li>후렴이나 메인 테마처럼 안정적으로 나와야 하는 부분은 내리고, 브리지나 간주처럼 새로운 아이디어가 필요한 부분은 조금 올립니다.</li>
+    <li><a href="#mood-horror">공포</a>, <a href="#genre-ambient">앰비언트</a>처럼 불안정한 느낌이 필요한 곡은 평소보다 올려 볼 만합니다.</li>
+  </ul>
+  <p>처음 시작할 값은 <a href="#slider-start">슬라이더 시작값</a> 문서를 참고하세요.</p>
+</article>
+
+<article class="doc" data-id="style-influence" data-cat="basics" data-title="Style Influence" hidden>
+  <h1>Style Influence</h1>
+  <div class="docmeta">분류: 기본 원리 · 슬라이더</div>
+  <dl class="facts">
+    <dt>하는 일</dt><dd>Style 입력란에 쓴 내용을 얼마나 충실히 따를지 정합니다.</dd>
+    <dt>범위</dt><dd><span class="tag official">공식</span> Loose에서 Strong까지</dd>
+    <dt>주의</dt><dd>높인다고 품질이 오르지는 않습니다.</dd>
+  </dl>
+  <h2>사용 요령</h2>
+  <p>장르가 엉뚱하게 나오면 먼저 <a href="#variety">Variety</a>를 0으로 두고 Style 입력란에 쓴 내용을 단순하게 줄이세요. 그다음 Style Influence를 조금 올려 봅니다. Style 입력란에 서로 부딪치는 묘사가 섞여 있으면 Style Influence를 높여도 결과가 나아지지 않습니다.</p>
+</article>
+
+<article class="doc" data-id="audio-influence" data-cat="basics" data-title="Audio Influence" hidden>
+  <h1>Audio Influence</h1>
+  <div class="docmeta">분류: 기본 원리 · 슬라이더</div>
+  <dl class="facts">
+    <dt>하는 일</dt><dd>업로드한 오디오를 얼마나 따를지 정합니다.</dd>
+    <dt>표시 조건</dt><dd><span class="tag official">공식</span> 오디오를 업로드했을 때만 나타납니다.</dd>
+  </dl>
+  <p>직접 녹음한 멜로디나 리프를 바탕으로 곡을 만들 때 씁니다. 업로드한 소리를 살리고 싶으면 올리고, 분위기만 참고하게 하고 싶으면 내립니다.</p>
+</article>
+
+<article class="doc" data-id="variety" data-cat="basics" data-title="Variety" hidden>
+  <h1>Variety</h1>
+  <div class="docmeta">분류: 기본 원리 · 슬라이더 · v6</div>
+  <dl class="facts">
+    <dt>하는 일</dt><dd><span class="tag official">공식</span> 결과가 다양해지도록 SUNO가 Style 입력란에 쓴 내용을 고쳐 씁니다.</dd>
+    <dt>권장 값</dt><dd>Style 입력란에 쓴 묘사어를 그대로 유지하려면 0으로 내리세요. 비교 실험할 때는 항상 0으로 둡니다.</dd>
+    <dt>도입 시점</dt><dd>v6 (2026년 9월)</dd>
+  </dl>
+  <div class="note">
+    <p>v6 출시 직후 커뮤니티에 "내가 쓴 프롬프트가 바뀌어 있다"는 글이 많이 올라왔습니다. SUNO의 v6 FAQ가 밝힌 원인은 Variety 슬라이더입니다. 프롬프트를 비교 실험할 때는 먼저 Variety를 0으로 두고 시작하세요.</p>
+  </div>
+  <p>Variety는 <a href="#weirdness">Weirdness</a>와 다른 장치입니다. Weirdness는 결과가 얼마나 예상 밖으로 나올지를 정하고, Variety는 여러분이 Style 입력란에 쓴 내용 자체를 바꿀지를 정합니다.</p>
+</article>
+
+<article class="doc" data-id="edit-tools" data-cat="basics" data-title="편집·부가 기능" hidden>
+  <h1>편집·부가 기능</h1>
+  <div class="docmeta">분류: 기본 원리</div>
+  <h2>Remix &amp; Edit</h2>
+  <p><span class="tag official">공식</span> 아래 세 기능이 v6 기반으로 제공됩니다. <a href="#arrange-study">편곡 공부 방법</a>과 <a href="#arrange-workflow">편곡 공부 작업 순서</a>에서 이 세 기능을 씁니다.</p>
+  <ul>
+    <li><b>Extend:</b> 곡 뒤나 앞에 이어 붙이기</li>
+    <li><b>Cover:</b> 같은 곡을 다른 스타일로 다시 부르거나 연주하기</li>
+    <li><b>Replace Section:</b> 일부 구간만 교체하기</li>
+  </ul>
+  <h2>Suno Sounds</h2>
+  <p><span class="tag official">공식</span> 오디오 샘플과 효과음을 생성하는 기능입니다. 음악 레퍼런스와는 별개지만, 앰비언스 질감을 찾을 때 참고할 수 있습니다.</p>
+  <h2>Suno Studio</h2>
+  <p>브라우저에서 돌아가는 멀티트랙 편집 환경으로, Premier 요금제에서 씁니다. 2026년 8월 Studio 2.0에서 MIDI 녹음과 내장 신스가 추가되었습니다. <a href="#midi">MIDI 추출</a>도 Studio에서 합니다.</p>
+</article>
+
+<!-- ===== 주의사항 ===== -->
+<article class="doc" data-id="rights" data-cat="caution" data-title="권리와 상업적 이용" hidden>
+  <h1>권리와 상업적 이용</h1>
+  <div class="docmeta">분류: 주의사항</div>
+  <p>권리는 곡을 만들 때 어떤 요금제였는지를 기준으로 정해집니다.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>구분</th><th>무료(Basic)</th><th>Pro / Premier</th></tr></thead>
+    <tbody>
+      <tr><td>곡의 소유</td><td>SUNO가 소유</td><td><span class="tag verify">확인 필요</span>SUNO 도움말 문서마다 표현이 다릅니다. 한 문서는 구독 중 만든 곡을 사용자가 소유한다고 적었고, 다른 문서는 대체로 SUNO가 소유한다고 답합니다. 약관 원문을 확인하세요.</td></tr>
+      <tr><td>상업적 이용</td><td>불가. 개인적·비상업적 용도만</td><td>구독 중 만든 곡에 상업적 이용권 부여, 해지 후에도 유지</td></tr>
+      <tr><td>나중에 구독하면?</td><td colspan="2">무료로 만든 곡에 상업적 이용권이 소급 적용되지 않습니다.</td></tr>
+      <tr><td>저작권 등록</td><td colspan="2">별개 문제입니다. 상업적 이용권이 있어도 저작권 보호 대상이 아닐 수 있고, 국가마다 기준이 다릅니다.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>레퍼런스 곡은 내부 회의용이라 대부분 상업적 이용이 필요 없습니다. 그래도 회사 프로젝트에서 SUNO를 쓰기 전에는 그 회사의 AI 사용 기준을 먼저 확인하세요. <span class="tag guess">추측</span> 회사마다 기준이 다르고, 외부 AI 도구 사용 자체를 막는 곳도 있을 수 있습니다.</p>
+</article>
+
+<article class="doc" data-id="downloads" data-cat="caution" data-title="다운로드 한도" hidden>
+  <h1>다운로드 한도</h1>
+  <div class="docmeta">분류: 주의사항 · 2026년 9월 3일부터 적용</div>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>요금제</th><th>다운로드 한도</th></tr></thead>
+    <tbody>
+      <tr><td>무료</td><td class="num">총 7곡 (매달 초기화되지 않음)</td></tr>
+      <tr><td>Pro</td><td class="num">월 20곡</td></tr>
+      <tr><td>Premier</td><td class="num">월 60곡, Suno Studio 사용 시 제한 없음</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>한도를 넘으면 추가 다운로드를 구매할 수 있습니다. 이 한도는 9월 3일 이전에 만든 곡에도 적용됩니다. 그래서 기획자에게 방향 샘플을 보여 줄 때는 파일을 내려받지 말고 SUNO 링크로 공유하세요. 다운로드 횟수는 DAW에서 실제로 분석할 곡에만 쓰세요.</p>
+  <div class="note">
+    <p>요금제, 한도, 기능 이름은 자주 바뀝니다. 이 위키의 내용은 2026년 11월에 확인한 것이므로, 수업 전에 <a href="https://suno.com/pricing">suno.com/pricing</a>과 SUNO 도움말에서 최신 내용을 한 번 더 확인하세요.</p>
+  </div>
+</article>
+
+<article class="doc" data-id="names" data-cat="caution" data-title="아티스트 이름과 곡 제목" hidden>
+  <h1>아티스트 이름과 곡 제목</h1>
+  <div class="docmeta">분류: 주의사항</div>
+  <p>"○○ 작곡가 스타일", "○○ 게임 OST 느낌"처럼 실명이나 작품명을 넣으면 생성이 막히거나 이름이 다른 말로 바뀝니다. 대신 그 음악의 특성을 분해해서 적으세요. 이 분해 작업 자체가 좋은 분석 훈련입니다.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>분해 항목</th><th>스스로 던질 질문</th><th>예시 표현</th></tr></thead>
+    <tbody>
+      <tr><td>시대·장르</td><td>몇 년대 어떤 장르에 가까운가?</td><td>1990s JRPG orchestral, 2010s hybrid trailer</td></tr>
+      <tr><td>편성</td><td>주선율 악기와 반주 악기는?</td><td>solo oboe lead, string pad, harp arpeggios</td></tr>
+      <tr><td>템포·리듬</td><td>BPM과 박자감은?</td><td>140 BPM, driving 16th-note ostinato</td></tr>
+      <tr><td>음색·질감</td><td>밝은가, 거친가, 따뜻한가?</td><td>warm analog, lo-fi tape saturation</td></tr>
+      <tr><td>공간·믹스</td><td>가까운가, 넓은 홀인가?</td><td>dry close mix, large concert hall reverb</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>분해한 항목은 <a href="#style-order">Style 입력란 작성 순서</a>에 맞춰 배치하세요.</p>
+</article>
+
+<article class="doc" data-id="limits" data-cat="caution" data-title="SUNO가 보장하지 않는 것" hidden>
+  <h1>SUNO가 보장하지 않는 것</h1>
+  <div class="docmeta">분류: 주의사항</div>
+  <ul>
+    <li><b>게임용 루프:</b> 끝과 처음이 자연스럽게 이어지는 루프 포인트를 지정하는 기능은 제가 확인한 공식 문서에서는 찾지 못했습니다. 루프는 DAW에서 직접 잘라 만드세요.</li>
+    <li><b>정확한 길이와 싱크:</b> "정확히 45초", "12초에 클라이맥스" 같은 지시는 지켜지지 않을 때가 많습니다. <span class="tag guess">추측</span> 생성 후 편집으로 맞추는 걸 전제로 하세요.</li>
+    <li><b>조성과 화성의 정확성:</b> 지정한 조와 다른 조로 나오거나, 중간에 조가 흔들릴 수 있습니다.</li>
+    <li><b>깨끗한 스템:</b> 스템을 분리하면 다른 악기 소리가 섞여 나옵니다(블리드). 리버브가 많은 곡일수록 심해집니다. 자세한 내용은 <a href="#stems">스템 추출</a> 문서에 있습니다.</li>
+    <li><b>MIDI 정확도:</b> 오디오에서 추출한 MIDI에는 틀린 음과 어긋난 박이 섞여 있습니다. 정리하지 않고 그대로 쓰면 안 됩니다. <a href="#midi">MIDI 추출</a> 문서를 참고하세요.</li>
+    <li><b>같은 결과의 재현:</b> 같은 프롬프트로도 같은 곡은 나오지 않습니다. 그래서 <a href="#worksheet">실습 기록지</a>에 매번 기록해야 합니다.</li>
+  </ul>
+</article>
+
+<!-- ===== 프롬프트 ===== -->
+<article class="doc" data-id="fields" data-cat="prompt" data-title="세 입력란의 역할" hidden>
+  <h1>세 입력란의 역할</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p>Advanced(Custom) 모드에서 작업하세요. Simple 모드는 한 줄 설명만으로 곡을 만들 수 있지만 조절할 수 있는 항목이 적습니다.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>입력란</th><th>하는 일</th><th>쓰는 방법</th></tr></thead>
+    <tbody>
+      <tr><td><b>Style</b></td><td>곡 전체의 소리</td><td>문장보다 쉼표로 구분한 영어 묘사어가 일반적입니다. <span class="tag community">커뮤니티</span> → <a href="#style-order">Style 입력란 작성 순서</a></td></tr>
+      <tr><td><b>Lyrics</b></td><td>곡의 진행 순서</td><td>연주곡이면 가사 대신 구간 태그와 구간별 지시만 적습니다. → <a href="#lyrics-structure">Lyrics 입력란으로 곡 구조 잡기</a></td></tr>
+      <tr><td><b>Exclude</b></td><td>빼고 싶은 것</td><td>no 없이 빼고 싶은 요소의 이름만 적습니다(예: drums, vocals). → <a href="#exclude">Exclude 입력란 작성법</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+</article>
+
+<article class="doc" data-id="style-order" data-cat="prompt" data-title="Style 입력란 작성 순서" hidden>
+  <h1>Style 입력란 작성 순서</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p><span class="tag community">커뮤니티</span> 여러 사용자 테스트에서 공통으로 나온 결과는 "앞에 쓴 단어가 더 큰 영향을 준다"는 것입니다. 장르 단어를 다섯 번째에서 첫 번째로 옮기기만 해도 장르 정확도가 눈에 띄게 올라갔다는 보고가 있습니다. 그래서 아래 순서를 기본으로 쓰세요.</p>
+  <ul class="order">
+    <li><b>1</b>장르·시대</li>
+    <li><b>2</b>분위기·에너지</li>
+    <li><b>3</b>주요 악기 2~3개</li>
+    <li><b>4</b>보컬 또는 instrumental</li>
+    <li><b>5</b>프로덕션·공간</li>
+    <li><b>6</b>템포(BPM 숫자)</li>
+  </ul>
+  <p>묘사어는 5~8개 정도가 적당하다는 보고가 많습니다. 단어를 더 넣으면 묘사끼리 부딪쳐서 오히려 원하는 방향이 흐려집니다. 템포는 "fast"보다 "150 BPM"처럼 숫자로 적으세요.</p>
+  <h2>예시</h2>
+  <div class="prompt"><div class="plabel"><span>나쁜 예 · 순서 없이 나열</span><button class="copy" type="button">복사</button></div><pre>cool, fast, boss, piano, orchestra, dark, cinematic, choir, good quality</pre></div>
+  <div class="prompt"><div class="plabel"><span>좋은 예 · 순서대로 정리</span><button class="copy" type="button">복사</button></div><pre>dark epic orchestral, menacing and urgent, low brass, staccato strings, taiko drums, instrumental, large hall reverb, 150 BPM</pre></div>
+  <p>나쁜 예에서 "cool", "good quality"는 소리를 정하지 못하는 말입니다. "piano"와 "orchestra"는 무엇이 주인공인지 알려 주지 않습니다. 좋은 예는 장르가 맨 앞에 있고, 악기마다 역할(저음 금관, 짧게 끊는 현, 타악기)이 드러납니다.</p>
+  <p>순서가 실제로 얼마나 영향을 주는지는 <a href="#order-test">순서 실험</a>으로 직접 확인하세요. <a href="#builder">프롬프트 빌더</a>를 쓰면 이 순서대로 자동으로 배치됩니다.</p>
+</article>
+
+<article class="doc" data-id="order-test" data-cat="prompt" data-title="순서 실험" hidden>
+  <h1>순서 실험</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p>같은 단어를 순서만 바꿔서 뽑아 보면 차이를 직접 들을 수 있습니다. 아래 두 프롬프트로 실험해 보세요. <a href="#variety">Variety</a>는 0, 나머지 슬라이더는 기본값으로 두고, 모델도 같은 것을 씁니다.</p>
+  <div class="prompt"><div class="plabel"><span>실험 A · 오케스트라를 앞에</span><button class="copy" type="button">복사</button></div><pre>orchestral, epic, choir, taiko drums, synth bass, instrumental, 130 BPM</pre></div>
+  <div class="prompt"><div class="plabel"><span>실험 B · 타악기와 신스를 앞에</span><button class="copy" type="button">복사</button></div><pre>taiko drums, synth bass, epic, choir, orchestral, instrumental, 130 BPM</pre></div>
+  <p><span class="tag guess">추측</span> A는 현과 금관이 바탕을 깔고 타악기가 얹히는 곡에, B는 리듬과 저음이 앞에 나서는 하이브리드 곡에 가까울 가능성이 높습니다. 실제로 그렇게 들리는지, 각자 2회 이상 뽑아서 확인하고 기록하세요. 한 번만 뽑으면 우연인지 순서 때문인지 구분할 수 없습니다.</p>
+  <h2>확인할 항목</h2>
+  <ul>
+    <li>곡의 바탕 장르가 무엇으로 들리는가</li>
+    <li>주선율을 맡은 악기는 무엇인가 (앞에 쓴 악기가 주선율을 맡는 경향이 있는지)</li>
+    <li>믹스에서 가장 크게 들리는 요소는 무엇인가</li>
+  </ul>
+  <p>여러분이 만든 프롬프트로 실험하려면 <a href="#builder">프롬프트 빌더</a>의 "순서를 바꾼 비교용 프롬프트 만들기"를 쓰세요.</p>
+</article>
+
+<article class="doc" data-id="lyrics-structure" data-cat="prompt" data-title="Lyrics 입력란으로 곡 구조 잡기" hidden>
+  <h1>Lyrics 입력란으로 곡 구조 잡기</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p>Lyrics 입력란에 적은 태그 순서가 곧 곡의 진행 순서입니다. 태그는 해당 구간 바로 앞, 한 줄에 하나씩 둡니다. 연주곡이라면 대괄호 안에 그 구간의 편성을 함께 적어 보세요.</p>
+  <div class="prompt"><div class="plabel"><span>Lyrics 입력란 · 연주곡 구조 예시</span><button class="copy" type="button">복사</button></div><pre>[Intro: solo harp, soft string pad]
+
+[Main Theme: french horn melody, full strings]
+
+[Build: taiko drums enter, rising brass]
+
+[Climax: full orchestra, wordless choir]
+
+[Outro: strings only, slowly fading]
+
+[End]</pre></div>
+  <p>구간 태그는 SUNO에 보내는 신호일 뿐이고 결과를 강제하지는 않습니다. 그래도 <span class="tag community">커뮤니티</span> 태그를 넣으면 구간이 더 분명하게 나뉜다는 보고가 있어서, 나중에 Replace Section으로 구간을 바꾸거나 스템을 분석할 때 훨씬 편합니다.</p>
+  <div class="warn">
+    <p>연주곡을 만들 때 구간 태그 뒤에 일반 텍스트를 쓰면 그 텍스트를 가사로 부르는 경우가 있으니 주의하세요.</p>
+  </div>
+</article>
+
+<article class="doc" data-id="exclude" data-cat="prompt" data-title="Exclude 입력란 작성법" hidden>
+  <h1>Exclude 입력란 작성법</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p>빼고 싶은 요소는 Exclude 입력란에 쓰세요. Style 입력란에 "no vocals, no drums"라고 쓰면 오히려 vocals와 drums라는 단어가 프롬프트에 들어간 셈이 됩니다. <span class="tag community">커뮤니티</span> 실제로 원치 않는 요소가 더 나왔다는 보고가 많습니다.</p>
+  <p>Exclude 입력란에는 no 없이 빼고 싶은 요소의 이름만 적습니다.</p>
+  <div class="prompt"><div class="plabel"><span>Exclude 입력란 예시 · 긴장감 있는 연주곡</span><button class="copy" type="button">복사</button></div><pre>vocals, choir, drum kit, bright melody</pre></div>
+  <p><a href="#moods">분위기별 문서</a>마다 Exclude 입력란 예시가 함께 있습니다.</p>
+</article>
+
+<article class="doc" data-id="slider-start" data-cat="prompt" data-title="슬라이더 시작값" hidden>
+  <h1>슬라이더 시작값</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p><span class="tag community">커뮤니티</span> 아래 값은 사용자들이 테스트로 정리한 출발점이고, SUNO가 공식으로 정한 값은 아닙니다. 여기서부터 조금씩 움직여 보는 기준으로 쓰세요.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>목적</th><th>Weirdness</th><th>Style Influence</th><th>Variety</th></tr></thead>
+    <tbody>
+      <tr><td>처음 비교 기준 만들기</td><td class="num">45~55</td><td class="num">50~65</td><td class="num">0</td></tr>
+      <tr><td>오케스트라 큐</td><td class="num">55~70</td><td class="num">45~60</td><td class="num">0</td></tr>
+      <tr><td>앰비언트·실험적 곡</td><td class="num">70~85</td><td class="num">35~55</td><td>탐색 시 올려 봄</td></tr>
+      <tr><td>후렴·메인 테마를 안정적으로</td><td>내림</td><td>올림</td><td class="num">0</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>각 슬라이더의 뜻은 <a href="#weirdness">Weirdness</a>, <a href="#style-influence">Style Influence</a>, <a href="#variety">Variety</a> 문서에 있습니다.</p>
+</article>
+
+<article class="doc" data-id="one-change" data-cat="prompt" data-title="한 번에 하나만 바꾸기" hidden>
+  <h1>한 번에 하나만 바꾸기</h1>
+  <div class="docmeta">분류: 프롬프트</div>
+  <p>결과가 마음에 들지 않을 때 프롬프트, 모델, 슬라이더를 한꺼번에 바꾸면 무엇이 효과가 있었는지 알 수 없습니다. 장르가 엉뚱하게 나오면 Variety를 0으로 두고 Style 입력란에 쓴 내용을 단순하게 줄인 다음 Style Influence를 조금 올려 보세요. 결과가 너무 산만하면 Weirdness만 내려 보세요.</p>
+  <p>항상 하나씩 바꾸고, 바꾼 내용을 <a href="#worksheet">실습 기록지</a>에 적어 두세요.</p>
+</article>
+
+<article class="doc" data-id="builder" data-cat="prompt" data-title="프롬프트 빌더" hidden>
+  <h1>프롬프트 빌더</h1>
+  <div class="docmeta">분류: 프롬프트 · 도구</div>
+  <p>항목을 고르면 <a href="#style-order">Style 입력란 작성 순서</a>에 맞춰 묘사어를 배치해 줍니다. "순서를 바꾼 비교용 프롬프트 만들기"를 누르면 같은 단어를 다른 순서로 배치한 프롬프트가 함께 나오니, <a href="#order-test">순서 실험</a>에 바로 쓰세요.</p>
+  <div class="builder">
+    <div class="row">
+      <div><label for="b-genre">1. 장르·시대</label><select id="b-genre"></select></div>
+      <div><label for="b-mood">2. 분위기·에너지</label><select id="b-mood"></select></div>
+    </div>
+    <fieldset>
+      <legend>3. 주요 악기 (최대 3개, 고른 순서대로 들어갑니다)</legend>
+      <div class="checks" id="b-inst"></div>
+    </fieldset>
+    <div class="row">
+      <div><label for="b-vocal">4. 보컬</label><select id="b-vocal"></select></div>
+      <div><label for="b-space">5. 프로덕션·공간</label><select id="b-space"></select></div>
+      <div><label for="b-bpm">6. 템포 (BPM)</label><input id="b-bpm" type="number" min="40" max="220" value="120"></div>
+    </div>
+    <div class="btnrow">
+      <button class="act" type="button" id="b-make">프롬프트 만들기</button>
+      <button class="act ghost" type="button" id="b-shuffle">순서를 바꾼 비교용 프롬프트 만들기</button>
+    </div>
+    <div class="prompt"><div class="plabel"><span>Style 입력란</span><button class="copy" type="button">복사</button></div><pre id="b-out"></pre></div>
+    <div class="prompt"><div class="plabel"><span>Exclude 입력란에 넣을 단어(추천)</span><button class="copy" type="button">복사</button></div><pre id="b-ex"></pre></div>
+    <div class="prompt" id="b-altbox" hidden><div class="plabel"><span>비교용 · 순서만 다름</span><button class="copy" type="button">복사</button></div><pre id="b-alt"></pre></div>
+    <p class="small" id="b-msg">예시 값으로 채워져 있습니다. 항목을 바꾼 뒤 "프롬프트 만들기"를 누르세요.</p>
+  </div>
+</article>
+
+<!-- ===== 분위기 / 음악 장르 / 게임 장르 색인 ===== -->
+<article class="doc" data-id="moods" data-cat="mood" data-title="분위기별 프롬프트" hidden>
+  <h1>분위기별 프롬프트</h1>
+  <div class="docmeta">분류: 분위기 · 색인</div>
+  <p>분위기를 표현할 때 "sad", "happy" 같은 감정 단어 하나로는 부족합니다. 그 감정을 만드는 음악적 장치(템포, 음역, 리듬 밀도, 공간감)를 함께 적어야 원하는 쪽으로 좁혀집니다. 아래 문서의 예시는 출발점이니, 장면에 맞게 단어를 바꿔 쓰세요.</p>
+  <ul class="doclist" data-list="mood"></ul>
+</article>
+
+<article class="doc" data-id="genres" data-cat="genre" data-title="음악 장르별 프롬프트" hidden>
+  <h1>음악 장르별 프롬프트</h1>
+  <div class="docmeta">분류: 음악 장르 · 색인</div>
+  <p>장르 단어는 Style 입력란 맨 앞에 둡니다. "rock"보다 "melodic metalcore"처럼 하위 장르까지 적을수록 결과가 덜 평범해진다는 보고가 많습니다. <span class="tag community">커뮤니티</span></p>
+  <ul class="doclist" data-list="genre"></ul>
+  <div class="note">
+    <p>동양풍 음악은 악기 이름을 정확히 적어도 다른 나라 악기 소리와 섞여 나오는 경우가 있습니다. <span class="tag guess">추측</span> 가야금을 적었는데 고토처럼 들리지 않는지, 해금을 적었는데 얼후처럼 들리지 않는지 귀로 꼭 확인하세요. 이 구분을 할 수 있어야 실무에서 레퍼런스를 고를 수 있습니다.</p>
+  </div>
+</article>
+
+<article class="doc" data-id="games" data-cat="game" data-title="게임 장르별 프롬프트" hidden>
+  <h1>게임 장르별 프롬프트</h1>
+  <div class="docmeta">분류: 게임 장르 · 색인</div>
+  <p>게임음악은 장면마다 따로 필요합니다. 그래서 곡 하나를 잘 만드는 것보다 "같은 게임에서 나온 곡처럼 들리는 묶음"을 만드는 게 중요합니다.</p>
+  <h2>세계관 팔레트를 고정하세요</h2>
+  <p>한 게임의 레퍼런스를 여러 곡 만들 때는 Style 입력란 앞부분에 세계관을 정하는 묘사어를 고정해 두고, 뒷부분의 상황 단어만 바꿉니다. 예를 들어 켈틱 판타지 MMORPG라면 이렇게 씁니다.</p>
+  <div class="prompt"><div class="plabel"><span>팔레트는 고정, 상황 단어만 바꾸기</span><button class="copy" type="button">복사</button></div><pre>마을: celtic fantasy orchestral, tin whistle, harp, fiddle, warm and peaceful, light hand percussion, instrumental, 96 BPM
+필드: celtic fantasy orchestral, tin whistle, harp, fiddle, adventurous and open, full strings, instrumental, 110 BPM
+던전: celtic fantasy orchestral, tin whistle, harp, fiddle, dark and tense, low drones, sparse percussion, instrumental, 80 BPM</pre></div>
+  <p>메인 테마가 정해졌다면 Cover 기능을 써서 그 곡을 다른 분위기로 바꿔 보는 방법도 있습니다. <span class="tag guess">추측</span> 원곡의 선율 흔적이 남기 때문에 텍스트만으로 따로 만들 때보다 묶음의 통일감이 생기기 쉽습니다.</p>
+  <h2>게임 장르별 문서</h2>
+  <ul class="doclist" data-list="game"></ul>
+</article>
+
+<!-- ===== 편곡 ===== -->
+<article class="doc" data-id="arrange-basics" data-cat="arrange" data-title="편곡 공부에 쓸 곡의 조건" hidden>
+  <h1>편곡 공부에 쓸 곡의 조건</h1>
+  <div class="docmeta">분류: 편곡</div>
+  <p>편곡을 공부하려고 SUNO를 쓸 때는 듣기 좋은 곡보다 <b>뜯어보기 좋은 곡</b>을 만들어야 합니다. 악기가 너무 많고 리버브가 두꺼우면 스템을 분리해도 소리가 뭉쳐 나오고, 어떤 악기가 무슨 역할을 하는지 귀로 따라가기 어렵습니다.</p>
+  <h2>뜯어보기 좋은 곡의 조건</h2>
+  <ul>
+    <li><b>악기 3~5개:</b> 역할이 겹치지 않게 고릅니다. 예를 들어 선율 1, 화성 1, 베이스 1, 리듬 1.</li>
+    <li><b>잔향을 줄인 믹스:</b> Style 입력란 끝에 "dry close mix", "minimal reverb"를 넣습니다. 공간감은 나중에 DAW에서 직접 입히면 됩니다.</li>
+    <li><b>숫자로 된 BPM:</b> DAW로 가져갈 때 템포를 맞추기 쉽습니다.</li>
+    <li><b>구간 태그:</b> <a href="#lyrics-structure">Lyrics 입력란</a>에 구간을 나눠 두면 어디서 편성이 바뀌는지 찾기 쉽습니다.</li>
+  </ul>
+  <div class="prompt"><div class="plabel"><span>편곡 분석에 쓸 Style 예시</span><button class="copy" type="button">복사</button></div><pre>fantasy orchestral chamber piece, gentle and nostalgic, solo flute melody, harp arpeggios, cello bass line, light frame drum, instrumental, dry close mix, minimal reverb, 92 BPM</pre></div>
+  <p>이 조건으로 곡을 만든 다음에는 <a href="#arrange-workflow">편곡 공부 작업 순서</a>를 따라가세요.</p>
+</article>
+
+<article class="doc" data-id="arrange-workflow" data-cat="arrange" data-title="편곡 공부 작업 순서" hidden>
+  <h1>편곡 공부 작업 순서</h1>
+  <div class="docmeta">분류: 편곡</div>
+  <ol class="steps">
+    <li><h3>스케치</h3><p>v6-mini로 방향이 다른 곡을 여러 개 빠르게 만들어 봅니다. 무료 요금제에서도 쓸 수 있는 모델이라 프롬프트 연습에 부담이 적습니다.</p></li>
+    <li><h3>방향 확정</h3><p>v6로 바꾸고 Variety를 0으로 둡니다. 좋은 결과가 나올 때까지 프롬프트를 한 항목씩만 바꿔 가며 뽑습니다.</p></li>
+    <li><h3>구조 고정</h3><p>Lyrics 입력란에 구간 태그를 넣어 곡 구조를 정합니다. 마음에 드는 구간이 있으면 그 곡을 기준으로 삼고 다시 생성하지 않습니다.</p></li>
+    <li><h3>변주</h3><p>Cover로 편성을 바꾸고, Extend로 뒤를 이어 붙이고, Replace Section으로 마음에 들지 않는 구간만 교체합니다. → <a href="#edit-tools">편집·부가 기능</a></p></li>
+    <li><h3>스템 추출</h3><p>악기별 트랙으로 나눕니다. Pro 이상 요금제가 필요합니다. → <a href="#stems">스템 추출</a></p></li>
+    <li><h3>MIDI 추출</h3><p>Premier 요금제의 Suno Studio에서 스템을 MIDI로 바꿉니다. → <a href="#midi">MIDI 추출</a></p></li>
+    <li><h3>DAW에서 분석과 재작업</h3><p>스템과 MIDI를 DAW에 불러와 역할을 분석합니다. 여기서부터는 여러분의 작업입니다. 분석한 내용을 바탕으로 직접 편곡하세요. → <a href="#arrange-study">편곡 공부 방법</a></p></li>
+  </ol>
+</article>
+
+<article class="doc" data-id="stems" data-cat="arrange" data-title="스템 추출" hidden>
+  <h1>스템 추출</h1>
+  <div class="docmeta">분류: 편곡</div>
+  <dl class="facts">
+    <dt>위치</dt><dd>곡 옆 메뉴의 Get Stems</dd>
+    <dt>요금제</dt><dd><span class="tag official">공식</span> Pro와 Premier에서만 됩니다.</dd>
+    <dt>분리 방식</dt><dd><span class="tag official">공식</span> Pro는 Auto와 Split from Mix, Premier는 여기에 Advanced 모드까지 쓸 수 있습니다.</dd>
+    <dt>최대 개수</dt><dd>12개 스템</dd>
+  </dl>
+  <p>Advanced 모드에서는 100종에 가까운 악기 목록에서 원하는 악기를 골라 추출할 수 있다고 외부 정리 글에서 소개합니다.</p>
+  <p>추출 전에 BPM을 수동으로 정해 두세요. 그러면 DAW에서는 프로젝트 템포를 같은 숫자로 맞추기만 하면 됩니다.</p>
+  <div class="warn">
+    <p>스템을 분리하면 다른 악기 소리가 섞여 나옵니다(블리드). 리버브가 많은 곡일수록 심해지므로, 처음부터 <a href="#arrange-basics">편곡 공부에 쓸 곡의 조건</a>에 맞춰 만드세요. 스템을 내려받으면 <a href="#downloads">다운로드 한도</a>도 함께 확인하세요.</p>
+  </div>
+</article>
+
+<article class="doc" data-id="midi" data-cat="arrange" data-title="MIDI 추출" hidden>
+  <h1>MIDI 추출</h1>
+  <div class="docmeta">분류: 편곡 · Premier</div>
+  <p>Suno Studio에서 스템을 고른 뒤 Get MIDI를 실행합니다. <span class="tag verify">확인 필요</span> 외부 정리 글에 따르면 스템 하나당 10크레딧이 듭니다.</p>
+  <p>추출한 MIDI는 반드시 퀀타이즈하고 틀린 음을 고쳐야 합니다. 오디오에서 추출한 MIDI에는 틀린 음과 어긋난 박이 섞여 있기 때문입니다. MIDI를 그대로 믿지 말고 <a href="#ear-copy">귀카피 체크리스트</a>로 확인하세요.</p>
+</article>
+
+<article class="doc" data-id="arrange-study" data-cat="arrange" data-title="편곡 공부 방법" hidden>
+  <h1>편곡 공부 방법</h1>
+  <div class="docmeta">분류: 편곡</div>
+  <h2>같은 주제, 다른 편성</h2>
+  <p>하나의 메인 테마를 Cover 기능으로 피아노 솔로, 현악 4중주, 풀 오케스트라, 칩튠으로 바꿔 봅니다. 각 버전에서 선율이 어느 악기로 옮겨 갔는지, 화성은 몇 개의 성부로 펼쳐졌는지, 베이스 라인은 유지됐는지 비교하세요. 편성이 바뀔 때 무엇을 남기고 무엇을 버릴지 정하는 것이 편곡에서 가장 먼저 내려야 할 판단입니다.</p>
+  <h2>축소판으로 뼈대 보기</h2>
+  <p>풍성한 곡을 "solo piano reduction"으로 Cover해 보세요. 화성 진행과 선율의 뼈대가 드러납니다. 이 뼈대를 귀로 받아 적은 뒤, 받아 적은 악보와 원곡을 대조하면서 어떤 악기가 어떤 음을 맡았는지 확인합니다.</p>
+  <h2>스템을 하나씩 꺼 보기</h2>
+  <p>DAW에서 스템을 하나씩 뮤트하면서 아래 표를 채웁니다. 어떤 스템을 껐을 때 곡이 무너지는지 확인하면 그 스템의 역할을 알 수 있습니다.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>역할</th><th>담당 스템</th><th>껐을 때 달라진 점</th></tr></thead>
+    <tbody>
+      <tr><td>주선율</td><td></td><td></td></tr>
+      <tr><td>대선율</td><td></td><td></td></tr>
+      <tr><td>화성(패드·코드)</td><td></td><td></td></tr>
+      <tr><td>베이스</td><td></td><td></td></tr>
+      <tr><td>리듬</td><td></td><td></td></tr>
+      <tr><td>색채(장식·효과)</td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h2>인터랙티브 음악 레이어 실험</h2>
+  <p>스템을 강도별 레이어로 다시 묶어 보는 실험은 <a href="#layer-test">레이어 실험</a> 문서에 따로 정리했습니다.</p>
+</article>
+
+<article class="doc" data-id="layer-test" data-cat="arrange" data-title="레이어 실험" hidden>
+  <h1>레이어 실험</h1>
+  <div class="docmeta">분류: 편곡 · 인터랙티브 음악</div>
+  <p>풀 편성 전투곡 하나를 만들고 스템으로 나눈 뒤, 강도별 레이어로 다시 묶어 봅니다. 같은 곡에서 나온 스템은 템포와 조성이 맞기 때문에, 따로 만든 곡을 이어 붙일 때보다 연결이 자연스럽습니다.</p>
+  <div class="tablebox">
+  <table>
+    <thead><tr><th>게임 상태</th><th>켜는 스템</th></tr></thead>
+    <tbody>
+      <tr><td>탐험</td><td>패드, 베이스</td></tr>
+      <tr><td>경계</td><td>탐험 + 타악기 일부</td></tr>
+      <tr><td>전투</td><td>전체</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>이 실험은 Wwise나 FMOD에서 수직 레이어링을 설계하기 전에 개념을 잡는 연습입니다. 실제 게임에 넣을 음악은 레이어를 처음부터 분리해서 직접 작곡해야 블리드 없이 깨끗하게 쓸 수 있습니다.</p>
+</article>
+
+<article class="doc" data-id="ear-copy" data-cat="arrange" data-title="귀카피 체크리스트" hidden>
+  <h1>귀카피 체크리스트</h1>
+  <div class="docmeta">분류: 편곡</div>
+  <ul>
+    <li>조성과 코드 진행을 받아 적었는가</li>
+    <li>베이스 라인이 근음 위주인가, 선율적으로 움직이는가</li>
+    <li>리듬 패턴을 한 마디 단위로 적었는가</li>
+    <li>대선율이 있다면 어느 구간에서 등장하는가</li>
+    <li>구간마다 악기가 몇 개씩 겹쳐 있는가 (레이어 수 변화)</li>
+    <li>클라이맥스 직전에 무엇을 빼거나 더해서 긴장을 만들었는가</li>
+  </ul>
+</article>
+
+<!-- ===== 실습·참고 ===== -->
+<article class="doc" data-id="worksheet" data-cat="tools" data-title="실습 기록지" hidden>
+  <h1>실습 기록지</h1>
+  <div class="docmeta">분류: 실습·참고</div>
+  <p>같은 프롬프트로도 같은 곡은 나오지 않습니다. 마음에 든 결과가 나왔을 때 무엇을 바꿔서 그렇게 됐는지 모르면 그 방법을 다음 작업에 다시 쓸 수 없습니다. 그래서 모델, Style 입력란, Exclude 입력란, 슬라이더 값을 매번 적어 두어야 합니다.</p>
+  <p>생성할 때마다 아래 양식을 복사해서 노트나 과제 문서에 붙여 넣고 채우세요. 2개월에 한 번 있는 정기 상담 때 이 기록을 가져오세요. 기록을 보면서 여러분이 어떤 기준으로 레퍼런스를 고르는지 구체적으로 피드백해 드리겠습니다.</p>
+  <div class="prompt"><div class="plabel"><span>기록 양식</span><button class="copy" type="button">복사</button></div><pre>날짜:
+목적: (방향 합의 / 비교 실험 / 편곡 연구)
+게임 장면:
+모델: (v6 / v6-wild / v6-mini)
+Style:
+Lyrics(구간 태그):
+Exclude:
+Weirdness / Style Influence / Variety:
+이번에 바꾼 항목 1개:
+결과 요약: (장르, 주선율 악기, 느껴지는 템포, 구조)
+의도와 달랐던 점:
+다음에 바꿔 볼 항목:
+SUNO 링크:</pre></div>
+</article>
+
+<article class="doc" data-id="sources" data-cat="tools" data-title="출처" hidden>
+  <h1>출처</h1>
+  <div class="docmeta">분류: 실습·참고 · 확인 시점 2026-11-08</div>
+  <p>'공식' 표시가 붙은 내용은 아래 SUNO 문서에서 확인했습니다. '커뮤니티'와 '확인 필요' 표시가 붙은 내용은 외부 가이드와 사용자 테스트 정리 글을 참고했습니다.</p>
+  <h2>SUNO 공식 문서</h2>
+  <ol>
+    <li><a href="https://suno.com/blog/introducing-v6">SUNO 블로그 · Introducing v6 (2026-09-09)</a></li>
+    <li><a href="https://help.suno.com/en/articles/13924801">SUNO 도움말 · What's new in v6?</a></li>
+    <li><a href="https://help.suno.com/en/articles/6141377">SUNO 도움말 · How to Use: Creative Sliders</a></li>
+    <li><a href="https://help.suno.com/en/articles/13925185">SUNO 도움말 · How do I get stems?</a></li>
+    <li><a href="https://help.suno.com/en/articles/12702337">SUNO 도움말 · Advanced Stem Separation</a></li>
+    <li><a href="https://help.suno.com/en/articles/2410177">SUNO 도움말 · Can I distribute my songs to Spotify, etc?</a></li>
+    <li><a href="https://help.suno.com/en/articles/2416769">SUNO 도움말 · Does Suno own the music I make?</a></li>
+    <li><a href="https://help.suno.com/en/articles/2746945">SUNO 도움말 · Do I have the copyrights to songs I made?</a></li>
+  </ol>
+  <h2>보도와 외부 정리 글</h2>
+  <ol>
+    <li><a href="https://www.musicbusinessworldwide.com/suno-limits-subscribers-downloads-per-month/">Music Business Worldwide · 다운로드 한도 보도</a></li>
+    <li><a href="https://www.digitalmusicnews.com/2026/08/10/suno-limiting-downloads-ai-slop/">Digital Music News · 다운로드 한도 세부 내용</a></li>
+    <li><a href="https://blog.dubspot.com/suno-studio-2-0">Dubspot · Suno Studio 2.0</a></li>
+    <li><a href="https://blog.dubspot.com/export-ai-stems-to-your-daw-2026">Dubspot · 스템을 DAW로 가져가는 방법</a></li>
+    <li><a href="https://undetectr.com/blog/suno-v6-changing-your-prompt">Undetectr · v6 Variety 슬라이더 설명</a></li>
+    <li><a href="https://roo.beehiiv.com/p/suno-prompting">Style 입력란 순서와 길이에 대한 커뮤니티 테스트 정리</a></li>
+    <li><a href="https://hookgenius.app/learn/suno-style-tag-research/">HookGenius · Style 태그 테스트 결과</a></li>
+    <li><a href="https://jackrighteous.com/blogs/guides-using-suno-ai-music-creation/creative-control-sliders-suno-v5">Jack Righteous · 슬라이더 시작값 정리</a></li>
+  </ol>
+</article>
+
+<article class="doc" data-id="search" data-cat="" data-title="검색 결과" hidden>
+  <h1 id="s-title">검색 결과</h1>
+  <div class="docmeta" id="s-meta"></div>
+  <ul class="results" id="s-list"></ul>
+</article>
+
+<article class="doc" data-id="notfound" data-cat="" data-title="문서 없음" hidden>
+  <h1>문서를 찾을 수 없습니다</h1>
+  <p>주소가 바뀌었거나 아직 없는 문서입니다. <a href="#home">대문</a>으로 돌아가거나 왼쪽 검색창에서 찾아보세요.</p>
+</article>
+
+</div>
+<footer class="sitefoot">
+  <p class="who">엠나인아카데미 수강생용 학습자료</p>
+  <p>게임음악작곡 과정 · SUNO 레퍼런스 곡 위키 · 수업 내부 배포용 · 2026년 11월 기준</p>
+</footer>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var CATS = [
+    ["start","시작하기"],["basics","기본 원리"],["caution","주의사항"],["prompt","프롬프트"],
+    ["mood","분위기"],["genre","음악 장르"],["game","게임 장르"],["arrange","편곡"],["tools","실습·참고"]
+  ];
+  var CATNAME = {}; CATS.forEach(function(c){CATNAME[c[0]]=c[1];});
+
+  var MOODS = [
+    {id:"mood-tension", t:"긴장 · 잠입", s:"적에게 들키지 않게 움직이는 구간, 퍼즐 제한 시간", p:"dark cinematic underscore, tense and suspenseful, low string ostinato, muted pulse synth, sparse percussion hits, instrumental, dry close mix, 90 BPM", ex:"vocals, choir, drum kit, bright melody", tip:"긴장은 선율보다 반복되는 리듬과 낮게 깔린 지속음에서 나옵니다. 결과를 들을 때 선율이 너무 튀어서 플레이를 방해하지 않는지 확인하세요."},
+    {id:"mood-horror", t:"공포", s:"폐건물 탐색, 점프 스케어 직전", p:"horror ambient, unsettling and eerie, detuned piano, bowed metal textures, low drones, instrumental, wide dark reverb, slow free tempo", ex:"drums, upbeat, major key, vocals", tip:"Weirdness를 평소보다 올려 보세요. 박자가 분명하면 오히려 덜 무섭게 들리니, 템포는 숫자 대신 slow free tempo처럼 적는 것도 방법입니다."},
+    {id:"mood-sad", t:"서정 · 슬픔", s:"동료와의 이별, 회상 컷신", p:"emotional piano ballad, melancholic and tender, solo piano, warm cello, soft string pad, instrumental, intimate room, 72 BPM", ex:"drums, synth, vocals", tip:"악기를 늘리면 감정이 흐려집니다. 피아노와 첼로처럼 두세 악기로 시작하고, 필요할 때 Extend로 현악을 더해 보세요."},
+    {id:"mood-heroic", t:"장엄 · 영웅", s:"메인 타이틀, 각성 장면", p:"epic orchestral, heroic and triumphant, french horns, full strings, timpani, instrumental, large concert hall, 120 BPM", ex:"electric guitar, synth, vocals", tip:"영웅적인 느낌은 호른 선율과 넓은 음역에서 나옵니다. 금관이 선율을 맡았는지, 현이 받쳐 주는지 들어 보세요."},
+    {id:"mood-peaceful", t:"평화 · 마을", s:"마을 BGM, 휴식 공간", p:"acoustic folk, warm and peaceful, acoustic guitar, flute, light hand percussion, instrumental, cozy dry mix, 96 BPM", ex:"heavy drums, distortion, vocals", tip:"오래 반복되는 곡이라 밀도가 낮아야 합니다. 결과에서 악기가 너무 많이 움직인다면 악기 하나를 빼고 다시 만들어 보세요."},
+    {id:"mood-mystery", t:"신비 · 탐험", s:"고대 유적, 처음 보는 지역", p:"fantasy ambient orchestral, mysterious and wondrous, celesta, harp arpeggios, airy strings, instrumental, spacious reverb, 80 BPM", ex:"drum kit, rock, vocals", tip:"첼레스타, 하프 같은 반짝이는 음색이 신비감을 만듭니다. 화성이 해결되지 않고 떠 있는 느낌인지 귀로 확인하세요."},
+    {id:"mood-comic", t:"코믹 · 경쾌", s:"미니게임, 개그 이벤트", p:"quirky orchestral comedy, playful and bouncy, pizzicato strings, bassoon, glockenspiel, instrumental, bright dry mix, 132 BPM", ex:"dark, heavy, choir, vocals", tip:"바순과 피치카토는 코믹 오케스트라에서 자주 쓰는 조합입니다. 박자가 너무 규칙적이면 재미가 줄어드니 Weirdness를 조금 올려 보세요."},
+    {id:"mood-battle", t:"일반 전투", s:"필드 몬스터 전투, 웨이브 방어", p:"hybrid orchestral action, driving and urgent, staccato strings, taiko drums, distorted synth bass, brass stabs, instrumental, punchy mix, 150 BPM", ex:"vocals, slow intro, ambient", tip:"효과음과 함께 들려야 하는 곡입니다. 중음역이 꽉 차 있으면 타격음이 묻히니, 결과를 효과음 위에 얹어서 들어 보세요."},
+    {id:"mood-boss", t:"보스 · 비장", s:"최종 보스, 페이즈 전환", p:"dark epic orchestral, menacing and climactic, low brass, aggressive strings, war drums, organ, large hall reverb, 160 BPM", ex:"pop, cheerful, acoustic guitar", tip:"합창을 넣고 싶다면 Instrumental을 켜는 대신 Lyrics 입력란에 [Choir: wordless chant]처럼 적어 보세요. 결과는 일정하지 않으니 여러 번 뽑아 비교합니다."},
+    {id:"mood-victory", t:"승리 · 팡파레", s:"스테이지 클리어, 보상 획득", p:"orchestral victory fanfare, bright and celebratory, trumpets, snare roll, cymbal swell, instrumental, short", ex:"vocals, slow, sad", tip:"정확한 길이를 지정하는 방법은 확인하지 못했습니다. Lyrics 입력란에 [Fanfare]와 [End]를 넣어 짧게 끝나도록 유도하고, 길이는 편집으로 맞추세요."}
+  ];
+
+  var GENRES = [
+    {id:"genre-cinematic", t:"시네마틱 오케스트라", a:"cinematic orchestral", i:"full strings, french horns, woodwinds, timpani, concert hall", c:"악기 이름을 많이 나열하면 각 악기 소리가 뭉개져서 섞여 나옵니다. strings, brass처럼 섹션 단위로 적고 주선율 악기 하나만 따로 지정하세요."},
+    {id:"genre-hybrid", t:"하이브리드 오케스트라", a:"hybrid orchestral trailer", i:"synth bass, braam hits, risers, staccato strings, taiko", c:"트레일러풍으로 쏠리기 쉽습니다. 게임 BGM이라면 trailer 대신 action underscore를 써 보세요."},
+    {id:"genre-chiptune", t:"칩튠", a:"chiptune, 8-bit", i:"square wave lead, triangle bass, noise percussion, arpeggiated chords", c:"실제 레트로 기기의 채널 수 제한까지 지켜진다는 보장은 없습니다. 기기 이름 대신 8-bit console style처럼 묘사하세요."},
+    {id:"genre-synthwave", t:"신스웨이브", a:"synthwave, 1980s retro", i:"analog poly synth, gated reverb drums, arpeggiator, warm bass", c:"보컬이 자주 붙는 장르라 연주곡이 필요하면 Instrumental과 Exclude 입력란의 vocals를 함께 쓰세요."},
+    {id:"genre-lofi", t:"로파이", a:"lofi hip hop, chill", i:"jazzy rhodes, vinyl crackle, soft boom bap drums, mellow bass", c:"질감 단어(vinyl crackle, tape)가 결과를 크게 바꿉니다. 메뉴나 로비 BGM 레퍼런스로 써 볼 만합니다."},
+    {id:"genre-ambient", t:"앰비언트 · 드론", a:"ambient, dark drone", i:"evolving pads, field textures, granular shimmer", c:"리듬이 끼어들기 쉬우니 Exclude 입력란에 drums, beat를 넣으세요."},
+    {id:"genre-metal", t:"록 · 메탈", a:"melodic metalcore instrumental", i:"drop-tuned guitars, double kick drums, lead guitar harmony", c:"하위 장르까지 적어야 평범해지지 않습니다. 보컬이 붙으면 Exclude 입력란에 vocals, screaming을 넣으세요."},
+    {id:"genre-electronic", t:"일렉트로닉", a:"drum and bass / trance / EDM", i:"reese bass, supersaw lead, sidechain pads", c:"장르마다 BPM 범위가 정해져 있습니다. 숫자 BPM을 꼭 적으세요."},
+    {id:"genre-jazz", t:"재즈", a:"big band swing / smooth jazz", i:"brass section, upright bass, brushed drums, piano comping", c:"즉흥성이 중요한 장르라 Weirdness를 조금 올려도 괜찮다는 보고가 있습니다."},
+    {id:"genre-celtic", t:"켈틱 · 포크", a:"celtic folk", i:"fiddle, tin whistle, bodhran, acoustic guitar, harp", c:"판타지 마을이나 필드 레퍼런스에 어울립니다. 템포가 빠르면 축제 느낌, 느리면 서정적인 느낌이 됩니다."},
+    {id:"genre-gugak", t:"국악 퓨전", a:"korean traditional fusion", i:"gayageum, daegeum, haegeum, janggu", c:"다른 동양 악기 소리와 섞이기 쉽습니다. 장단 느낌이 나는지도 확인하세요.", east:true},
+    {id:"genre-asian", t:"일본풍 · 중국풍", a:"japanese traditional / chinese traditional", i:"koto, shakuhachi, taiko / guzheng, erhu, dizi", c:"무협·사극풍 게임 레퍼런스에 씁니다. 국악 퓨전과 섞어 쓰면 어느 나라 음악인지 구분하기 어려워집니다.", east:true},
+    {id:"genre-vocal", t:"보컬곡(주제가)", a:"J-pop / anime opening style", i:"bright synths, driving drums, female vocals", c:"가사는 직접 쓰세요. 기존 곡 가사를 넣으면 막히고, 권리 문제도 생깁니다."}
+  ];
+
+  var GAMES = [
+    {id:"game-mmorpg", t:"MMORPG", need:"로그인 테마, 마을, 필드, 던전, 보스, 이벤트", how:"세계관 팔레트를 고정하고 상황 단어만 바꿉니다. 필드·마을 곡은 수십 분씩 반복되므로 밀도가 낮은 결과를 고르세요.", pr:"high fantasy orchestral, adventurous and open, solo flute, full strings, harp, instrumental, natural hall, 108 BPM", rel:["mood-peaceful","mood-mystery","mood-heroic","genre-celtic"]},
+    {id:"game-fps", t:"FPS · TPS", need:"메인 메뉴, 로비, 매치 시작·종료 스팅어", how:"총성과 발소리가 중요한 장르라, 매치 중에 쓰는 음악은 총성과 발소리가 들릴 주파수 대역을 비워 두어야 합니다. 저음과 중음이 꽉 찬 결과는 피하세요.", pr:"dark electronic hybrid, tense and focused, pulsing synth bass, metallic percussion, sparse pads, instrumental, tight mix, 128 BPM", rel:["mood-tension","mood-battle"]},
+    {id:"game-arpg", t:"액션 RPG · 소울라이크", need:"보스 페이즈 1·2, 거점 테마, 사망 화면", how:"페이즈 1 곡을 만든 뒤 Extend나 Replace Section으로 더 격해진 페이즈 2를 만들어 보세요. 같은 곡에서 출발하면 연결이 자연스럽습니다.", pr:"dark gothic orchestral, ominous and relentless, low choir pad, aggressive strings, pipe organ, war drums, instrumental, cathedral reverb, 140 BPM", rel:["mood-boss","mood-battle","edit-tools"]},
+    {id:"game-casual", t:"캐주얼 · 퍼즐 · 모바일", need:"메인 루프, 스테이지 BGM, 클리어 징글", how:"짧은 곡을 오래 반복하므로 선율이 너무 강하면 금방 질립니다. 밝되 리듬 위주의 결과를 고르세요.", pr:"cute casual game music, cheerful and light, marimba, pizzicato strings, ukulele, soft claps, instrumental, bright dry mix, 118 BPM", rel:["mood-comic","mood-victory","mood-peaceful"]},
+    {id:"game-rhythm", t:"리듬게임", need:"플레이 곡, 튜토리얼 곡", how:"템포가 흔들리면 쓸 수 없습니다. BPM을 숫자로 적고, Exclude 입력란에 tempo changes, ritardando를 넣어 보세요. 효과가 일정하지 않으니 DAW에서 박을 꼭 확인합니다.", pr:"j-core electronic, energetic and bright, supersaw lead, hard kick, piano riffs, instrumental, loud polished mix, 180 BPM", rel:["genre-electronic","exclude"]},
+    {id:"game-subculture", t:"서브컬처 수집형 RPG", need:"캐릭터 테마, 이벤트 곡, 주제가", how:"캐릭터마다 대표 악기를 정해 두면 묶음으로 관리하기 쉽습니다. 보컬곡은 가사를 직접 써서 넣으세요.", pr:"anime fantasy orchestral pop, hopeful and sparkling, piano, string section, light drums, glockenspiel, instrumental, polished mix, 124 BPM", rel:["genre-vocal","mood-heroic"]},
+    {id:"game-horror", t:"호러", need:"탐색 앰비언스, 추격, 세이브룸", how:"추격 곡과 세이브룸 곡의 대비가 중요합니다. 탐색 곡은 Weirdness를 올리고, 세이브룸 곡은 낮춰서 안정감을 주세요.", pr:"dark ambient horror, dread and isolation, sub drones, scraping strings, distant piano notes, instrumental, wide reverb, slow free tempo", rel:["mood-horror","mood-tension","genre-ambient"]},
+    {id:"game-racing", t:"레이싱", need:"메뉴, 레이스 BGM, 결과 화면", how:"빠른 BPM과 반복 가능한 그루브가 필요합니다. 인트로가 길면 레이스 시작과 맞지 않으니, Lyrics 입력란에 [Intro: short, 2 bars]처럼 인트로를 짧게 하라고 적어 보세요.", pr:"high energy drum and bass, driving and fast, reese bass, breakbeat drums, synth stabs, instrumental, punchy loud mix, 174 BPM", rel:["genre-electronic","lyrics-structure"]},
+    {id:"game-strategy", t:"전략 · RTS · 4X", need:"시대별 테마, 평시·전시 BGM", how:"한 판이 길기 때문에, 오래 들어도 귀에 거슬리지 않는 곡이 필요합니다. 시대가 바뀌는 게임이라면 팔레트는 그대로 두고 시대 단어만 바꿔 보세요.", pr:"orchestral strategy game music, contemplative and grand, solo cello, low strings, frame drum, distant horns, instrumental, warm hall, 90 BPM", rel:["genre-cinematic"]},
+    {id:"game-roguelike", t:"로그라이크 · 인디", need:"층별 BGM, 상점, 보스", how:"짧은 곡이 많이 필요해 v6-mini 스케치가 특히 유용합니다. 칩튠이나 신스 계열로 팔레트를 정하고 층마다 분위기 단어만 바꾸세요.", pr:"dark synth chiptune hybrid, tense and driving, square lead, analog bass, punchy electronic drums, instrumental, 140 BPM", rel:["genre-chiptune","genre-synthwave","models"]},
+    {id:"game-vn", t:"비주얼 노벨 · 스토리", need:"일상, 감정 장면별 소품, 엔딩", how:"감정마다 짧은 소품이 여러 개 필요합니다. 피아노와 현악 정도로 편성을 작게 유지하면 대사를 방해하지 않습니다.", pr:"gentle piano and strings, warm and everyday, solo piano, light violin, soft pad, instrumental, intimate room, 84 BPM", rel:["mood-sad","mood-peaceful"]}
+  ];
+
+  var REL = {
+    "why":["inputs","style-order","arrange-basics"],
+    "inputs":["fields","models","variety","limits"],
+    "models":["one-change","edit-tools"],
+    "weirdness":["style-influence","variety","slider-start"],
+    "style-influence":["weirdness","variety","slider-start"],
+    "audio-influence":["style-influence","edit-tools"],
+    "variety":["style-influence","order-test","one-change"],
+    "edit-tools":["arrange-study","layer-test","stems"],
+    "rights":["downloads","names"],
+    "downloads":["rights","stems"],
+    "names":["style-order","rights"],
+    "limits":["stems","midi","lyrics-structure"],
+    "fields":["style-order","lyrics-structure","exclude"],
+    "style-order":["order-test","builder","exclude"],
+    "order-test":["style-order","variety","builder","worksheet"],
+    "lyrics-structure":["fields","edit-tools","arrange-basics"],
+    "exclude":["fields","style-order","moods"],
+    "slider-start":["weirdness","style-influence","variety","one-change"],
+    "one-change":["slider-start","worksheet","models"],
+    "builder":["style-order","order-test","exclude"],
+    "moods":["style-order","exclude","games"],
+    "genres":["style-order","names","moods"],
+    "games":["moods","genres","edit-tools"],
+    "arrange-basics":["arrange-workflow","stems","arrange-study"],
+    "arrange-workflow":["stems","midi","edit-tools"],
+    "stems":["midi","downloads","layer-test"],
+    "midi":["stems","ear-copy"],
+    "arrange-study":["layer-test","ear-copy","edit-tools"],
+    "layer-test":["stems","arrange-study"],
+    "ear-copy":["arrange-study","midi"],
+    "worksheet":["one-change","order-test"]
+  };
+
+  function el(tag, attrs, text){var e=document.createElement(tag); if(attrs){for(var k in attrs){e.setAttribute(k, attrs[k]);}} if(text!=null){e.textContent=text;} return e;}
+  function promptBlock(label, text){
+    var box=el("div",{"class":"prompt"}), lab=el("div",{"class":"plabel"});
+    lab.appendChild(el("span",null,label));
+    lab.appendChild(el("button",{"class":"copy","type":"button"},"복사"));
+    box.appendChild(lab); box.appendChild(el("pre",null,text));
+    return box;
+  }
+  function newDoc(id, cat, title, sub){
+    var a=el("article",{"class":"doc","data-id":id,"data-cat":cat,"data-title":title});
+    a.hidden=true;
+    a.appendChild(el("h1",null,title));
+    a.appendChild(el("div",{"class":"docmeta"},"분류: "+CATNAME[cat]+(sub?" · "+sub:"")));
+    return a;
+  }
+  function facts(pairs){
+    var dl=el("dl",{"class":"facts"});
+    pairs.forEach(function(p){dl.appendChild(el("dt",null,p[0])); dl.appendChild(el("dd",null,p[1]));});
+    return dl;
+  }
+
+  var docsBox=document.getElementById("docs");
+  function insertAfterIndex(indexId, nodes){
+    var idx=docsBox.querySelector('article[data-id="'+indexId+'"]');
+    var ref=idx.nextSibling;
+    nodes.forEach(function(n){docsBox.insertBefore(n, ref);});
+  }
+
+  // 게임 → 분위기 역참조
+  var back={};
+  GAMES.forEach(function(g){g.rel.forEach(function(r){(back[r]=back[r]||[]).push(g.id);});});
+
+  insertAfterIndex("moods", MOODS.map(function(m){
+    var a=newDoc(m.id,"mood",m.t);
+    a.appendChild(facts([["쓰는 장면", m.s]]));
+    a.appendChild(promptBlock("Style 입력란", m.p));
+    a.appendChild(promptBlock("Exclude 입력란", m.ex));
+    a.appendChild(el("h2",null,"포인트"));
+    a.appendChild(el("p",null,m.tip));
+    REL[m.id]=["exclude","weirdness"].concat(back[m.id]||[]);
+    return a;
+  }));
+
+  insertAfterIndex("genres", GENRES.map(function(g){
+    var a=newDoc(g.id,"genre",g.t);
+    a.appendChild(promptBlock("Style 입력란 맨 앞에 둘 단어", g.a));
+    a.appendChild(facts([["어울리는 악기·질감", g.i],["주의할 점", g.c]]));
+    if(g.east){
+      var n=el("div",{"class":"note"}), np=el("p");
+      np.appendChild(el("span",{"class":"tag guess"},"추측"));
+      np.appendChild(document.createTextNode("동양풍 음악은 악기 이름을 정확히 적어도 다른 나라 악기 소리와 섞여 나오는 경우가 있습니다. 결과를 귀로 꼭 확인하세요."));
+      n.appendChild(np); a.appendChild(n);
+    }
+    REL[g.id]=["style-order","genres"].concat(g.east?[g.id==="genre-gugak"?"genre-asian":"genre-gugak"]:[]).concat(back[g.id]||[]);
+    return a;
+  }));
+
+  insertAfterIndex("games", GAMES.map(function(g){
+    var a=newDoc(g.id,"game",g.t);
+    a.appendChild(facts([["주로 필요한 곡", g.need],["SUNO 활용법", g.how]]));
+    a.appendChild(promptBlock("Style 입력란 예시", g.pr));
+    REL[g.id]=["games"].concat(g.rel);
+    return a;
+  }));
+
+  // 문서 목록 수집
+  var DOCS=[], BYID={};
+  Array.prototype.forEach.call(docsBox.querySelectorAll("article.doc"), function(a){
+    var d={id:a.getAttribute("data-id"), cat:a.getAttribute("data-cat"), title:a.getAttribute("data-title"), el:a};
+    BYID[d.id]=d;
+    if(d.cat){DOCS.push(d);}
+  });
+  document.getElementById("doccount").textContent="문서 "+DOCS.length+"개";
+  document.getElementById("navsum").textContent="문서 목록 ("+DOCS.length+"개)";
+  window.matchMedia("(min-width: 901px)").addEventListener("change", function(e){ if(e.matches){document.getElementById("navwrap").open=true;} });
+
+  // 색인 목록
+  Array.prototype.forEach.call(document.querySelectorAll("ul.doclist[data-list]"), function(ul){
+    var cat=ul.getAttribute("data-list");
+    DOCS.forEach(function(d){
+      if(d.cat!==cat||/^(moods|genres|games)$/.test(d.id)){return;}
+      var li=el("li"), a=el("a",{"href":"#"+d.id});
+      a.appendChild(document.createTextNode(d.title));
+      var sub=d.el.querySelector("dd");
+      if(sub){a.appendChild(el("span",null,sub.textContent.length>34?sub.textContent.slice(0,34)+"…":sub.textContent));}
+      li.appendChild(a); ul.appendChild(li);
+    });
+  });
+
+  // 관련 문서와 분류 표시
+  DOCS.forEach(function(d){
+    if(d.id==="home"){return;}
+    var box=el("div",{"class":"related"});
+    var rel=(REL[d.id]||[]).filter(function(r){return BYID[r]&&r!==d.id;});
+    if(rel.length){
+      box.appendChild(el("span",{"class":"lbl"},"관련 문서"));
+      var links=el("div",{"class":"links"});
+      rel.forEach(function(r){links.appendChild(el("a",{"href":"#"+r},BYID[r].title));});
+      box.appendChild(links);
+    }
+    var c=el("div");
+    c.appendChild(el("span",{"class":"lbl"},"분류"));
+    var cl=el("a",{"href":"#cat-"+d.cat},CATNAME[d.cat]);
+    c.appendChild(cl);
+    box.appendChild(c);
+    d.el.appendChild(box);
+  });
+
+  // 사이드바와 대문 분류 카드
+  var nav=document.getElementById("nav"), grid=document.getElementById("catgrid"), NAVLINK={}, NAVCAT={};
+  CATS.forEach(function(c){
+    var items=DOCS.filter(function(d){return d.cat===c[0];});
+    var det=el("details",{"class":"navcat"});
+    var sm=el("summary"); sm.appendChild(el("span",null,c[1])); sm.appendChild(el("span",{"class":"cnt"},String(items.length)));
+    det.appendChild(sm);
+    var ul=el("ul");
+    items.forEach(function(d){
+      var li=el("li"), a=el("a",{"href":"#"+d.id},d.title);
+      NAVLINK[d.id]=a; li.appendChild(a); ul.appendChild(li);
+    });
+    det.appendChild(ul); nav.appendChild(det); NAVCAT[c[0]]=det;
+
+    if(c[0]==="start"){return;}
+    var card=el("div",{"class":"catcard","id":"cat-"+c[0]});
+    card.appendChild(el("h3",null,c[1]));
+    var cu=el("ul");
+    items.slice(0,8).forEach(function(d){var li=el("li"); li.appendChild(el("a",{"href":"#"+d.id},d.title)); cu.appendChild(li);});
+    if(items.length>8){var li=el("li"); li.appendChild(el("a",{"href":"#"+items[0].id},"외 "+(items.length-8)+"개 문서 · 색인 보기")); cu.appendChild(li);}
+    card.appendChild(cu); grid.appendChild(card);
+  });
+
+  // 라우팅
+  var crumb=document.getElementById("crumb"), current=null;
+  function show(id){
+    DOCS.concat([BYID.search,BYID.notfound]).forEach(function(d){d.el.hidden=true;});
+    var d=BYID[id];
+    Object.keys(NAVLINK).forEach(function(k){NAVLINK[k].classList.remove("on");});
+    crumb.textContent="";
+    if(!d){d=BYID.notfound;}
+    d.el.hidden=false;
+    if(NAVLINK[d.id]){NAVLINK[d.id].classList.add("on");}
+    if(d.cat){
+      var wide=window.matchMedia("(min-width: 901px)").matches;
+      CATS.forEach(function(c){ if(c[0]===d.cat){NAVCAT[c[0]].open=true;} else if(!wide){NAVCAT[c[0]].open=false;} });
+      if(!wide){document.getElementById("navwrap").open=false;}
+      var h=el("a",{"href":"#home"},"대문"); crumb.appendChild(h);
+      if(d.id!=="home"){
+        crumb.appendChild(document.createTextNode(" › "+CATNAME[d.cat]+" › "+d.title));
+      }
+      document.title=(d.id==="home"?"SUNO 레퍼런스 곡 제작 가이드":d.title+" · SUNO 레퍼런스 곡 위키");
+    }
+    current=d.id;
+  }
+  function route(){
+    var h=(location.hash||"").replace(/^#/,"");
+    if(!h){h="home";}
+    if(h.indexOf("cat-")===0){
+      var cat=h.slice(4), first=DOCS.filter(function(d){return d.cat===cat;})[0];
+      if(cat==="mood"){first=BYID.moods;} if(cat==="genre"){first=BYID.genres;} if(cat==="game"){first=BYID.games;}
+      h=first?first.id:"notfound";
+    }
+    q.value="";
+    show(h);
+    var id=current;
+    if(goingBack){ goingBack=false; }
+    else if(stack.length>=2&&stack[stack.length-2]===id){ stack.pop(); }
+    else if(stack[stack.length-1]!==id){ stack.push(id); }
+    updateBack();
+    window.scrollTo(0,0);
+  }
+  var stack=[], goingBack=false, backBtn=document.getElementById("backbtn");
+  function updateBack(){
+    var searching=!BYID.search.el.hidden;
+    backBtn.disabled=!(searching||stack.length>1||current!=="home");
+    backBtn.title=searching?"검색을 닫고 보던 문서로":(stack.length>1?"이전 문서로":"대문으로");
+  }
+  backBtn.addEventListener("click", function(){
+    if(!BYID.search.el.hidden){ q.value=""; show(current||"home"); updateBack(); return; }
+    var target;
+    if(stack.length>1){ stack.pop(); target=stack[stack.length-1]; }
+    else { target="home"; stack=[]; }
+    goingBack=stack.length>0;
+    if(location.hash==="#"+target||(target==="home"&&!location.hash)){ goingBack=false; route(); }
+    else { location.hash=target; }
+  });
+
+  // 검색
+  var q=document.getElementById("q"), lastResults=[];
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function search(term){
+    var t=term.trim().toLowerCase();
+    if(!t){show(current&&BYID[current]&&current!=="search"?current:"home"); return;}
+    var res=[];
+    DOCS.forEach(function(d){
+      var title=d.title.toLowerCase(), text=d.el.textContent.replace(/\s+/g," "), low=text.toLowerCase();
+      var ti=title.indexOf(t), bi=low.indexOf(t);
+      if(ti<0&&bi<0){return;}
+      var start=Math.max(0,bi-36), snip=bi<0?"":(start>0?"…":"")+text.slice(start,bi+t.length+48)+"…";
+      res.push({d:d,score:(ti>=0?0:1),snip:snip});
+    });
+    res.sort(function(a,b){return a.score-b.score;});
+    lastResults=res;
+    var list=document.getElementById("s-list"); list.textContent="";
+    document.getElementById("s-title").textContent="\""+term.trim()+"\" 검색 결과";
+    document.getElementById("s-meta").textContent=res.length?res.length+"개 문서":"일치하는 문서가 없습니다. 다른 단어로 찾아보세요.";
+    var re=new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
+    res.forEach(function(r){
+      var li=el("li"), a=el("a",{"href":"#"+r.d.id},r.d.title);
+      li.appendChild(a); li.appendChild(el("span",{"class":"rc"},CATNAME[r.d.cat]));
+      if(r.snip){var p=el("p"); p.innerHTML=esc(r.snip).replace(re,function(m){return "<mark>"+m+"</mark>";}); li.appendChild(p);}
+      list.appendChild(li);
+    });
+    DOCS.forEach(function(d){d.el.hidden=true;}); BYID.notfound.el.hidden=true;
+    BYID.search.el.hidden=false;
+    crumb.textContent="검색";
+    updateBack();
+  }
+  q.addEventListener("input", function(){search(q.value);});
+  q.addEventListener("keydown", function(e){
+    if(e.key==="Enter"&&lastResults.length&&q.value.trim()){e.preventDefault(); var id=lastResults[0].d.id; if(location.hash==="#"+id){route();} else {location.hash=id;}}
+    if(e.key==="Escape"){q.value=""; search("");}
+  });
+  window.addEventListener("hashchange", route);
+
+  // 프롬프트 빌더
+  var B = {
+    genre:["epic orchestral","cinematic orchestral","hybrid orchestral action","fantasy orchestral chamber piece","celtic folk","korean traditional fusion","chiptune, 8-bit","synthwave, 1980s retro","lofi hip hop","dark ambient","melodic metalcore","drum and bass","j-core electronic","big band swing"],
+    mood:["heroic and triumphant","tense and suspenseful","melancholic and tender","warm and peaceful","mysterious and wondrous","playful and bouncy","driving and urgent","menacing and climactic","dread and isolation","hopeful and sparkling"],
+    inst:["french horns","full strings","staccato strings","solo piano","cello","harp arpeggios","solo flute","tin whistle","fiddle","celesta","taiko drums","timpani","pizzicato strings","acoustic guitar","synth bass","analog poly synth","square wave lead","gayageum","daegeum","wordless choir","pipe organ","marimba"],
+    vocal:["instrumental","female vocals","male vocals","wordless choir vocals"],
+    space:["dry close mix","large concert hall reverb","intimate room","wide dark reverb","punchy loud mix","lo-fi tape saturation","warm analog"]
+  };
+  function fill(id, arr, sel){var s=document.getElementById(id); arr.forEach(function(v,i){var o=el("option",{"value":v},v); if(i===sel){o.selected=true;} s.appendChild(o);});}
+  fill("b-genre", B.genre, 0); fill("b-mood", B.mood, 0); fill("b-vocal", B.vocal, 0); fill("b-space", B.space, 1);
+  var picked=["french horns","full strings","timpani"];
+  var instBox=document.getElementById("b-inst");
+  B.inst.forEach(function(v,i){
+    var id="inst-"+i, lab=el("label",{"for":id}), cb=el("input",{"type":"checkbox","id":id,"value":v});
+    if(picked.indexOf(v)>-1){cb.checked=true;}
+    cb.addEventListener("change", function(){
+      if(cb.checked){
+        if(picked.length>=3){cb.checked=false; msg("악기는 3개까지 고를 수 있습니다. 하나를 해제한 뒤 다시 고르세요."); return;}
+        picked.push(v);
+      } else { picked=picked.filter(function(x){return x!==v;}); }
+    });
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(v)); instBox.appendChild(lab);
+  });
+  function msg(t){document.getElementById("b-msg").textContent=t;}
+  function parts(){
+    var bpm=parseInt(document.getElementById("b-bpm").value,10);
+    var arr=[document.getElementById("b-genre").value, document.getElementById("b-mood").value].concat(picked).concat([document.getElementById("b-vocal").value, document.getElementById("b-space").value]);
+    if(!isNaN(bpm)&&bpm>=40&&bpm<=220){arr.push(bpm+" BPM");}
+    return arr;
+  }
+  function exclude(){
+    var v=document.getElementById("b-vocal").value, g=document.getElementById("b-genre").value, m=document.getElementById("b-mood").value, ex=[];
+    if(v==="instrumental"){ex.push("vocals");}
+    if(/ambient/.test(g)){ex.push("drums","beat");}
+    if(/peaceful|tender|wondrous/.test(m)){ex.push("heavy drums","distortion");}
+    if(/tense|menacing|dread/.test(m)){ex.push("cheerful","major key");}
+    if(/playful|hopeful|triumphant/.test(m)){ex.push("dark","horror");}
+    if(!ex.length){ex.push("(필요한 경우에만 적으세요)");}
+    return ex.join(", ");
+  }
+  function make(){
+    var bpm=parseInt(document.getElementById("b-bpm").value,10), p=parts(), n=p.length;
+    document.getElementById("b-out").textContent=p.join(", ");
+    document.getElementById("b-ex").textContent=exclude();
+    var t=n<5?"묘사어가 "+n+"개입니다. 악기를 하나 더 고르면 결과가 덜 평범해질 수 있습니다.":
+      n>8?"묘사어가 "+n+"개입니다. 8개 안팎으로 줄여 보세요.":
+      "묘사어 "+n+"개를 Style 입력란 작성 순서대로 배치했습니다. Variety를 0으로 두고 생성하세요.";
+    if(isNaN(bpm)||bpm<40||bpm>220){t="BPM은 40~220 사이 숫자로 적어야 프롬프트에 들어갑니다. "+t;}
+    msg(t); return p;
+  }
+  document.getElementById("b-make").addEventListener("click", function(){make(); document.getElementById("b-altbox").hidden=true;});
+  document.getElementById("b-shuffle").addEventListener("click", function(){
+    var p=make(), head=p.slice(0,2), mid=p.slice(2);
+    var bpmTag=mid.length&&/BPM$/.test(mid[mid.length-1])?mid.pop():null;
+    var inst=mid.slice(0,picked.length), rest=mid.slice(picked.length);
+    var alt=inst.concat(head[1]?[head[1]]:[]).concat(rest).concat(head[0]?[head[0]]:[]);
+    if(bpmTag){alt.push(bpmTag);}
+    document.getElementById("b-alt").textContent=alt.join(", ");
+    document.getElementById("b-altbox").hidden=false;
+    msg("비교용은 악기를 맨 앞으로, 장르를 맨 뒤로 옮겼습니다. 두 프롬프트를 같은 모델·같은 슬라이더로 2회씩 뽑아 비교하세요.");
+  });
+  make();
+
+  // 복사
+  var toast=document.getElementById("toast"), timer=null;
+  function showToast(t){toast.textContent=t; toast.classList.add("show"); clearTimeout(timer); timer=setTimeout(function(){toast.classList.remove("show");},1600);}
+  document.addEventListener("click", function(e){
+    var b=e.target.closest("button.copy"); if(!b){return;}
+    var pre=b.closest(".prompt").querySelector("pre"), text=pre.textContent;
+    function fallback(){
+      try{var r=document.createRange(); r.selectNodeContents(pre); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); showToast("선택했습니다. Ctrl+C(⌘+C)로 복사하세요.");}catch(err){showToast("직접 드래그해서 복사하세요.");}
+    }
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast("복사했습니다.");}, fallback);}
+      else {fallback();}
+    }catch(err){fallback();}
+  });
+
+  route();
+})();
+</script>
+</body>
+</html>
